@@ -48,16 +48,16 @@
                     <i slot="prepend" class="fa fa-keyboard-o"></i>
                   </el-input>
                 </el-form-item>
-                <el-form-item prop="code">
-                  <el-input
-                    type="text"
-                    v-model="formLogin.code"
-                    placeholder="验证码">
-                    <template slot="append">
-                      <img class="login-code" src="./image/login-code.png">
-                    </template>
-                  </el-input>
-                </el-form-item>
+<!--                <el-form-item prop="code">-->
+<!--                  <el-input-->
+<!--                    type="text"-->
+<!--                    v-model="formLogin.code"-->
+<!--                    placeholder="验证码">-->
+<!--                    <template slot="append">-->
+<!--                      <img class="login-code" src="./image/login-code.png">-->
+<!--                    </template>-->
+<!--                  </el-input>-->
+<!--                </el-form-item>-->
                 <el-button
                   size="default"
                   @click="submit"

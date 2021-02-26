@@ -6,7 +6,3 @@ import "github.com/astaxie/beego"
 type BaseController struct {
 	beego.Controller
 }
-
-func (c *BaseController) Prepare() {
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", c.Ctx.Request.Header.Get("Origin"))
-}

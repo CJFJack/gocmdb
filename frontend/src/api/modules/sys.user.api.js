@@ -1,4 +1,5 @@
 import { find, assign } from 'lodash'
+import util from "@/libs/util";
 
 const users = [
   { username: 'admin', password: 'admin', uuid: 'admin-uuid', name: 'Admin' },
@@ -25,6 +26,14 @@ export default ({ service, request, serviceForMock, requestForMock, mock, faker,
       url: '/auth/logout',
       method: 'post',
       data
+    })
+  },
+  LIST_USERS (data = {}) {
+    // 接口请求
+    return request({
+      url: '/users/query',
+      method: 'post',
+      data,
     })
   }
 })

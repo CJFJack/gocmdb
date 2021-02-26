@@ -40,6 +40,7 @@ export default {
        * @description 注销
        */
       async function logout () {
+        api.SYS_USER_LOGOUT()
         // 删除cookie
         util.cookies.remove('token')
         util.cookies.remove('uuid')

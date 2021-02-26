@@ -1,12 +1,12 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/dgrijalva/jwt-go"
 	"gocmdb/base/controllers/base"
+	"gocmdb/base/errors"
 	"gocmdb/models"
-	"gocmdb/services"
-	"html/template"
-	"net/http"
 	"strings"
 )
 
@@ -22,25 +22,51 @@ func (c *AuthorizationController) getNav() string {
 	return strings.ToLower(strings.TrimSuffix(controllerName, "Controller"))
 }
 
-// Prepare 用户认证检查
-func (c *AuthorizationController) Prepare() {
-	sessionKey := beego.AppConfig.DefaultString("auth::SessionKey", "user")
-	sessionValue := c.GetSession(sessionKey)
-	c.Data["loginUser"] = nil
-	c.Data["nav"] = c.getNav()
+// 解析Token
+func (c *AuthorizationController) ParseToken() (t *jwt.Token, e *errors.Errors) {
+	errs := errors.New()
+	authString := c.Ctx.Input.Header("Authorization")
+	beego.Debug("AuthString:", authString)
 
-	if sessionValue != nil {
-		if pk, ok := sessionValue.(int); ok {
-			if user := services.UserService.GetByPk(pk); user != nil {
-				c.Data["loginUser"] = user
-				c.LoginUser = user
-				c.Data["xsrf_input"] = template.HTML(c.XSRFFormHTML())
-				return
+	kv := strings.Split(authString, " ")
+	if len(kv) != 2 || kv[0] != "Bearer" {
+		beego.Error("AuthString invalid:", authString)
+		errs.Add("auth", fmt.Sprintf("AuthString invalid: %s", authString))
+		return nil, errs
+	}
+	tokenString := kv[1]
+
+	// Parse token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		return []byte(beego.AppConfig.DefaultString("JWTTokenKey", "CMDB")), nil
+	})
+	if err != nil {
+		beego.Error("Parse token:", err)
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+				errs.Add("auth", "errInputData")
+				return nil, errs
+			} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+				// Token is either expired or not active yet
+				errs.Add("auth", "token expired")
+				return nil, errs
+			} else {
+				// Couldn't handle this token
+				errs.Add("auth", "errInputData")
+				return nil, errs
 			}
+		} else {
+			// Couldn't handle this token
+			errs.Add("auth", "errInputData")
+			return nil, errs
 		}
 	}
-
-	action := beego.AppConfig.DefaultString("auth::LoginAction", "AuthController.Login")
-	c.Redirect(beego.URLFor(action), http.StatusFound)
-
+	if !token.Valid {
+		beego.Error("Token invalid:", tokenString)
+		errs.Add("auth", fmt.Sprintf("Token invalid: %s", tokenString))
+		return nil, errs
+	}
+	beego.Debug("Token:", token)
+	return token, nil
 }
