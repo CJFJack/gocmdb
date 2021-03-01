@@ -16,12 +16,6 @@ type AuthorizationController struct {
 	LoginUser *models.User
 }
 
-// 获取nav
-func (c *AuthorizationController) getNav() string {
-	controllerName, _ := c.GetControllerAndAction()
-	return strings.ToLower(strings.TrimSuffix(controllerName, "Controller"))
-}
-
 // 解析Token
 func (c *AuthorizationController) ParseToken() (t *jwt.Token, e *errors.Errors) {
 	errs := errors.New()

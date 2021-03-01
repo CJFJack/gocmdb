@@ -10,7 +10,7 @@ const cookies = {}
  */
 cookies.set = function (name = 'default', value = '', cookieSetting = {}) {
   const currentCookieSetting = {
-    expires: 1
+    expires: 1 // 天
   }
   Object.assign(currentCookieSetting, cookieSetting)
   Cookies.set(`sid-${process.env.VUE_APP_VERSION}-${name}`, value, currentCookieSetting)

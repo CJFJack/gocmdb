@@ -1,10 +1,12 @@
 package services
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/orm"
 	"gocmdb/forms"
 	"gocmdb/models"
 	"gocmdb/utils"
+	"strconv"
 	"time"
 )
 
@@ -22,33 +24,36 @@ func (s *userService) GetByPk(pk int) *models.User {
 }
 
 // 新增用户
-func (s *userService) Add(form *forms.UserAddForm) {
+func (s *userService) Add(rawData map[string]interface{}) error {
 	ormer := orm.NewOrm()
-	if user := s.GetByName(form.Name); user != nil {
-		user.StaffID = form.StaffID
-		user.Deleted = 0
-		user.Status = 0
-		user.NickName = form.NickName
-		user.Password = utils.GeneratePassword(form.Password)
-		user.Gender = form.Gender
-		user.Tel = form.Tel
-		user.Email = form.Email
-		user.Department = form.Department
-		ormer.Update(user, "Deleted", "Status", "StaffID", "NickName", "Password", "Gender", "Tel", "Email", "Department")
-		return
+	status, _ := strconv.Atoi(rawData["Status"].(string))
+	gender, _ := rawData["Gender"].(int)
+	if user := s.GetByName(rawData["Name"].(string)); user != nil {
+		user.StaffID = rawData["StaffID"].(string)
+		user.Deleted = rawData["Deleted"].(int)
+		user.Status = status
+		user.NickName, _ = rawData["NickName"].(string)
+		user.Password = utils.GeneratePassword(rawData["Password"].(string))
+		user.Gender = gender
+		user.Tel = rawData["Tel"].(string)
+		user.Email = rawData["Email"].(string)
+		user.Department = rawData["Department"].(string)
+		_, err := ormer.Update(user, "Deleted", "Status", "StaffID", "NickName", "Password", "Gender", "Tel", "Email", "Department")
+		return err
 	}
 	user := &models.User{
-		StaffID:    form.StaffID,
-		Name:       form.Name,
-		NickName:   form.NickName,
-		Password:   utils.GeneratePassword(form.Password),
-		Gender:     form.Gender,
-		Tel:        form.Tel,
-		Email:      form.Email,
-		Department: form.Department,
-		Status:     0,
+		StaffID:    rawData["StaffID"].(string),
+		Name:       rawData["Name"].(string),
+		NickName:   rawData["NickName"].(string),
+		Password:   utils.GeneratePassword(rawData["Password"].(string)),
+		Gender:     gender,
+		Tel:        rawData["Tel"].(string),
+		Email:      rawData["Email"].(string),
+		Department: rawData["Department"].(string),
+		Status:     status,
 	}
-	ormer.ReadOrCreate(user, "Name")
+	_, _, err := ormer.ReadOrCreate(user, "Name")
+	return err
 }
 
 // 修改用户信息
@@ -61,13 +66,16 @@ func (s *userService) Modify(form *forms.UserModifyForm) {
 }
 
 // 删除用户数据
-func (s *userService) Delete(pk int) {
+func (s *userService) Delete(pk int) error {
 	if user := s.GetByPk(pk); user != nil {
 		now := time.Now()
 		user.DeletedAt = &now
 		user.Deleted = 1
 		ormer := orm.NewOrm()
-		ormer.Update(user, "DeletedAt", "Deleted")
+		_, err := ormer.Update(user, "DeletedAt", "Deleted")
+		return err
+	} else {
+		return fmt.Errorf("用户不存在")
 	}
 }
 
@@ -108,6 +116,23 @@ func (s *userService) Query(q string) []*models.User {
 	querySet = querySet.SetCond(cond)
 	querySet.All(&users)
 	return users
+}
+
+// 用户性别映射
+func (s *userService) GenderTextMap() map[string]string {
+	return map[string]string{
+		"1": "男",
+		"0": "女",
+	}
+}
+
+// 用户状态映射
+func (s *userService) StatusTextMap() map[string]string {
+	return map[string]string{
+		"0": "正常",
+		"1": "锁定",
+		"2": "离职",
+	}
 }
 
 // 用户操作实例

@@ -19,3 +19,8 @@ type UserAddForm struct {
 	Department string `form:"department"`
 	Status     int    `form:"status"`
 }
+
+// 用户删除表单
+type UserDelForm struct {
+	ID float64 `form:"id"`
+}

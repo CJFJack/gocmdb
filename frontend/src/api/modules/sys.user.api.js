@@ -35,5 +35,29 @@ export default ({ service, request, serviceForMock, requestForMock, mock, faker,
       method: 'post',
       data,
     })
-  }
+  },
+  USER_ADD (data = {}) {
+    // 接口请求
+    return request({
+      url: '/users/add',
+      method: 'post',
+      data,
+    })
+  },
+  USER_MODIFY (data = {}) {
+    // 接口请求
+    return request({
+      url: '/users/modify',
+      method: 'post',
+      data,
+    })
+  },
+  USER_DEL (data = {}) {
+    // 接口请求
+    return request({
+      url: '/users/delete',
+      method: 'post',
+      data,
+    })
+  },
 })
