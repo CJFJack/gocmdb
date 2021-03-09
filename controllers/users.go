@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"gocmdb/base/controllers/auth"
-	"gocmdb/forms"
+	"gocmdb/models"
 	"gocmdb/services"
-	"net/http"
 )
 
 type UsersController struct {
@@ -57,17 +56,18 @@ func (c *UsersController) Add() {
 			c.ServeJSON()
 		}()
 
-		form := forms.UserAddForm{}
-		rawData, err := c.ParseJson(form)
+		model := models.NewUser()
+		err := c.ParseJson(model)
 		if err != nil {
 			result["code"] = 500
-			result["msg"] = err
+			result["msg"] = fmt.Sprintf("解析Json数据失败：%s", err)
 			return
 		}
-		err = services.UserService.Add(rawData)
+		beego.Info(model)
+		err = services.UserService.Add(model)
 		if err != nil {
 			result["code"] = 500
-			result["msg"] = err
+			result["msg"] = fmt.Sprintf("插入数据库失败：%s", err)
 			return
 		}
 	}
@@ -75,29 +75,28 @@ func (c *UsersController) Add() {
 
 // 修改用户信息
 func (c *UsersController) Modify() {
-	//c.Abort("NotPermission")
-	//return
-
-	form := &forms.UserModifyForm{}
-	// GET 获取参数
-	// POST 修改用户
-	if c.Ctx.Input.IsPost() {
-		if err := c.ParseForm(form); err == nil {
-			services.UserService.Modify(form)
-			flash := beego.NewFlash()
-			flash.Set("notice", "修改用户信息成功")
-			flash.Store(&c.AuthorizationController.BaseController.Controller)
-			c.Redirect(beego.URLFor("UsersController.Query"), http.StatusFound)
-		}
-	} else if pk, err := c.GetInt("pk"); err == nil {
-		if user := services.UserService.GetByPk(pk); user != nil {
-			form.ID = user.ID
-			form.Name = user.Name
-		}
+	result := map[string]interface{}{
+		"code": 0,
+		"msg":  "ok",
 	}
-	c.Data["form"] = form
-	c.Data["title"] = "用户编辑"
-	c.TplName = "user/modify.html"
+	defer func() {
+		c.Data["json"] = result
+		c.ServeJSON()
+	}()
+
+	model := models.NewUser()
+	err := c.ParseJson(model)
+	if err != nil {
+		result["code"] = 500
+		result["msg"] = err
+		return
+	}
+	err = services.UserService.Modify(model)
+	if err != nil {
+		result["code"] = 500
+		result["msg"] = err
+		return
+	}
 }
 
 // 删除用户
@@ -112,22 +111,14 @@ func (c *UsersController) Delete() {
 			c.ServeJSON()
 		}()
 
-		form := forms.UserDelForm{}
-		rawData, err := c.ParseJson(form)
+		model := models.NewUser()
+		err := c.ParseJson(model)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = err
 			return
 		}
-		id, ok := rawData["id"].(float64)
-		if !ok {
-			result["code"] = 500
-			result["msg"] = fmt.Errorf("断言Id失败")
-			return
-		}
-		fmt.Println("ok", ok)
-		fmt.Println("id", id)
-		err = services.UserService.Delete(int(id))
+		err = services.UserService.Delete(model.ID)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = err

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -20,7 +20,7 @@ func (c *LayoutController) Prepare() {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	user := claims["username"].(string)
-	fmt.Println(user)
+	beego.Info(user)
 	if !ok {
 		c.Abort("permission")
 		return

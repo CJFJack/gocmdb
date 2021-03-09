@@ -1,7 +1,7 @@
 <template>
     <d2-container>
         <template slot="header">用户管理</template>
-        <el-button type="primary" @click="dialogShow('add')">新增</el-button>
+        <el-button type="primary" @click="add('add')">新增</el-button>
         <template>
             <el-table
                     :data="tableData"
@@ -27,7 +27,7 @@
                         label="操作"
                         width="180">
                     <template slot-scope="scope">
-                        <el-button @click="edit(scope.row)" type="success" size="mini">修改</el-button>
+                        <el-button @click="modify(scope.row)" type="success" size="mini">修改</el-button>
                         <el-button type="danger" @click="delConfirm(scope.row)" size="mini">删除</el-button>
                     </template>
                 </el-table-column>
@@ -50,7 +50,7 @@
                 </el-form-item>
                 <el-form-item label="性别">
                     <el-select v-model="form.Gender" placeholder="请选择性别">
-                        <el-option v-for="(text, index) in genderTextMap" :label="text" :value="index"></el-option>
+                        <el-option v-for="(text, key, index) in genderTextMap" :label="text" :value="index"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="电话" prop="Tel">
@@ -67,7 +67,7 @@
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="form.Status" placeholder="请选择状态">
-                        <el-option v-for="(text, index) in statusTextMap" :label="text" :value="index"></el-option>
+                        <el-option v-for="(text, key, index) in statusTextMap" :label="text" :value="index"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -92,12 +92,12 @@
                     Name: '',
                     NickName: '',
                     Password: '',
-                    Gender: "0",
+                    Gender: 0,
                     Tel: "",
                     Email: "",
                     Addr: "",
                     Department: "",
-                    Status: "0",
+                    Status: 0,
                 },
                 genderTextMap: {},
                 statusTextMap: {},
@@ -117,18 +117,33 @@
                     await this.$api.USER_ADD(this.form)
                     this.listTable()
                 } else if (this.action === 'modify') {
-                    const res = await this.$api.USER_MODIFY()
+                    const res = await this.$api.USER_MODIFY(this.form)
                     this.listTable()
                 }
                 this.dialogVisible = false
             },
 
-            dialogShow(action) {
+            add(action) {
+                this.form = {
+                    StaffID: '',
+                        Name: '',
+                        NickName: '',
+                        Password: '',
+                        Gender: 0,
+                        Tel: "",
+                        Email: "",
+                        Addr: "",
+                        Department: "",
+                        Status: 0,
+                }
                 this.action = action
                 this.dialogVisible = true
             },
 
-            edit() {
+            modify(row) {
+                this.action = 'modify'
+                this.form = row
+                this.dialogVisible = true
             },
 
             async del (row){

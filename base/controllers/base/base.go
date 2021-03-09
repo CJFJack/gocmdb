@@ -10,7 +10,17 @@ type BaseController struct {
 	beego.Controller
 }
 
-func (c *BaseController) ParseJson(form interface{}) (map[string]interface{}, error) {
+func (c *BaseController) ParseJson(model interface{}) error {
+	c.Ctx.Input.CopyBody(10 * 1024 * 1024)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &model)
+	if err != nil {
+		return err
+	}
+	err = c.ParseForm(model)
+	return err
+}
+
+func (c *BaseController) ParsePostForm(form interface{}) (map[string]interface{}, error) {
 	c.Ctx.Input.CopyBody(10 * 1024 * 1024)
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &form)
 	return form.(map[string]interface{}), err

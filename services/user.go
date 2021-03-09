@@ -3,11 +3,8 @@ package services
 import (
 	"fmt"
 	"github.com/astaxie/beego/orm"
-	"gocmdb/forms"
 	"gocmdb/models"
 	"gocmdb/utils"
-	"strconv"
-	"time"
 )
 
 type userService struct {
@@ -24,55 +21,34 @@ func (s *userService) GetByPk(pk int) *models.User {
 }
 
 // 新增用户
-func (s *userService) Add(rawData map[string]interface{}) error {
+func (s *userService) Add(model *models.User) error {
 	ormer := orm.NewOrm()
-	status, _ := strconv.Atoi(rawData["Status"].(string))
-	gender, _ := rawData["Gender"].(int)
-	if user := s.GetByName(rawData["Name"].(string)); user != nil {
-		user.StaffID = rawData["StaffID"].(string)
-		user.Deleted = rawData["Deleted"].(int)
-		user.Status = status
-		user.NickName, _ = rawData["NickName"].(string)
-		user.Password = utils.GeneratePassword(rawData["Password"].(string))
-		user.Gender = gender
-		user.Tel = rawData["Tel"].(string)
-		user.Email = rawData["Email"].(string)
-		user.Department = rawData["Department"].(string)
-		_, err := ormer.Update(user, "Deleted", "Status", "StaffID", "NickName", "Password", "Gender", "Tel", "Email", "Department")
-		return err
-	}
-	user := &models.User{
-		StaffID:    rawData["StaffID"].(string),
-		Name:       rawData["Name"].(string),
-		NickName:   rawData["NickName"].(string),
-		Password:   utils.GeneratePassword(rawData["Password"].(string)),
-		Gender:     gender,
-		Tel:        rawData["Tel"].(string),
-		Email:      rawData["Email"].(string),
-		Department: rawData["Department"].(string),
-		Status:     status,
-	}
-	_, _, err := ormer.ReadOrCreate(user, "Name")
+	model.Password = utils.GeneratePassword(model.Password)
+	_, _, err := ormer.ReadOrCreate(model, "Name")
 	return err
 }
 
 // 修改用户信息
-func (s *userService) Modify(form *forms.UserModifyForm) {
-	if user := s.GetByPk(form.ID); user != nil {
-		user.Name = form.Name
+func (s *userService) Modify(model *models.User) error {
+	if user := s.GetByPk(model.ID); user != nil {
+		user.NickName = model.NickName
+		user.Gender = model.Gender
+		user.Status = model.Status
 		ormer := orm.NewOrm()
-		ormer.Update(user, "Name")
+		_, err := ormer.Update(user, "NickName", "Status", "Gender")
+		if err != nil {
+			return err
+		}
+		return nil
 	}
+	return nil
 }
 
 // 删除用户数据
 func (s *userService) Delete(pk int) error {
 	if user := s.GetByPk(pk); user != nil {
-		now := time.Now()
-		user.DeletedAt = &now
-		user.Deleted = 1
 		ormer := orm.NewOrm()
-		_, err := ormer.Update(user, "DeletedAt", "Deleted")
+		_, err := ormer.Delete(user)
 		return err
 	} else {
 		return fmt.Errorf("用户不存在")

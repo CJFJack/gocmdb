@@ -39,7 +39,7 @@ func (c *AuthController) Login() {
 
 		config.Cache.Incr("login")
 		form := forms.LoginForm{}
-		if rawData, err := c.ParseJson(form); err == nil {
+		if rawData, err := c.ParsePostForm(form); err == nil {
 			user := services.UserService.GetByName(rawData["username"].(string))
 			if user == nil {
 				// 用户不存在

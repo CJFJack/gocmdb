@@ -2,8 +2,11 @@ package forms
 
 // 用户修改表单
 type UserModifyForm struct {
-	ID   int    `form:"id"`
-	Name string `form:"name"`
+	ID       int    `form:"id"`
+	Name     string `form:"name"`
+	NickName string `form:"nick_name"`
+	Status   int    `form:"status"`
+	Gender   int    `form:"gender"`
 }
 
 // 用户修改表单
