@@ -10,13 +10,13 @@ type BaseController struct {
 	beego.Controller
 }
 
-func (c *BaseController) ParseJson(model interface{}) error {
+func (c *BaseController) ParseJson(jsonData interface{}) error {
 	c.Ctx.Input.CopyBody(10 * 1024 * 1024)
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &model)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &jsonData)
 	if err != nil {
 		return err
 	}
-	err = c.ParseForm(model)
+	err = c.ParseForm(jsonData)
 	return err
 }
 

@@ -31,6 +31,26 @@ const frameIn = [
         },
         component: _import('users')
       },
+      // 云平台管理
+      {
+        path: 'cloud/platform_management',
+        name: 'cloud_platform_management',
+        meta: {
+          title: '云平台管理',
+          auth: true
+        },
+        component: _import('cloud/platform_management')
+      },
+      // 云主机管理
+      {
+        path: 'cloud/virtual_machine',
+        name: 'cloud_virtual_machine',
+        meta: {
+          title: '云主机管理',
+          auth: true
+        },
+        component: _import('cloud/virtual_machine')
+      },
       // 系统 前端日志
       {
         path: 'log',

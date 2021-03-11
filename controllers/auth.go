@@ -82,7 +82,6 @@ func (c *AuthController) Login() {
 
 // 退出登录
 func (c *AuthController) Logout() {
-	c.DestroySession()
 	c.Data["json"] = map[string]interface{}{
 		"code": 0,
 		"msg":  "注销成功",

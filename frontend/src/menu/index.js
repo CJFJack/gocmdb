@@ -17,20 +17,6 @@ function supplementPath (menu) {
 
 export const menuHeader = supplementPath([
   { path: '/index', title: '首页', icon: 'home' },
-  {
-    title: '页面',
-    icon: 'folder-o',
-    children: [
-      { path: '/page1', title: '页面 1' },
-      { path: '/page2', title: '页面 2' },
-      { path: '/page3', title: '页面 3' }
-    ]
-  }
-])
-
-export const menuAside = supplementPath([
-  { path: '/index', title: '首页', icon: 'home' },
-  { path: '/users', title: '用户管理', icon: 'user' },
   // {
   //   title: '页面',
   //   icon: 'folder-o',
@@ -40,4 +26,17 @@ export const menuAside = supplementPath([
   //     { path: '/page3', title: '页面 3' }
   //   ]
   // }
+])
+
+export const menuAside = supplementPath([
+  { path: '/index', title: '首页', icon: 'home' },
+  { path: '/users', title: '用户管理', icon: 'user' },
+  {
+    title: '云管理',
+    icon: 'cloud',
+    children: [
+      { path: '/cloud/platform_management', title: '云平台管理', icon: 'cube' },
+      { path: '/cloud/virtual_machine', title: '云主机管理', icon: 'server' },
+    ]
+  }
 ])

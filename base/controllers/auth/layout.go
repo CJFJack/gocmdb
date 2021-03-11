@@ -26,3 +26,18 @@ func (c *LayoutController) Prepare() {
 		return
 	}
 }
+
+func (c *LayoutController) GetRequestUser() string {
+	c.AuthorizationController.Prepare()
+
+	// Prepare 登录验证
+	token, e := c.ParseToken()
+	if e != nil {
+		panic(e)
+		return ""
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		return claims["username"].(string)
+	}
+	return ""
+}

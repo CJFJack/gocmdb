@@ -1,6 +1,6 @@
 <template>
     <d2-container>
-        <template slot="header">用户管理</template>
+        <template slot="header">云主机管理</template>
         <el-button type="primary" @click="add('add')">新增</el-button>
         <template>
             <el-table
@@ -95,16 +95,7 @@
 
 <script>
     export default {
-        name: "users",
-        watch: {
-            "action": function (val) {
-                if (val === 'add') {
-                    this.rules.Password = [{required: true, message: '请输入密码', trigger: 'blur'}]
-                } else if (val === 'modify') {
-                    this.rules.Password = [{required: false}]
-                }
-            }
-        },
+        name: "cloud_virtual_machine",
         data() {
             return {
                 tableData: [],
@@ -167,6 +158,11 @@
             },
 
             saveForm() {
+                if (this.action === 'add') {
+                    this.rules.Password = [{required: true, message: '请输入密码', trigger: 'blur'}]
+                } else if (this.action === 'modify') {
+                    this.rules.Password = [{required: false}]
+                }
                 this.$refs["form"].validate(async (valid) => {
                     if (valid) {
                         if (this.action === 'add') {
@@ -204,7 +200,7 @@
 
             modify(row) {
                 this.action = 'modify'
-                this.form = JSON.parse(JSON.stringify(row))
+                this.form = row
                 this.dialogVisible = true
             },
 

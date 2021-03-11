@@ -7,12 +7,12 @@ import (
 	"gocmdb/services"
 )
 
-type UsersController struct {
+type CloudPlatformController struct {
 	auth.LayoutController
 }
 
-// 查询用户信息
-func (c *UsersController) Query() {
+// 查询云平台信息
+func (c *CloudPlatformController) Query() {
 	if c.Ctx.Input.IsPost() {
 		result := map[string]interface{}{
 			"code":          0,
@@ -21,6 +21,8 @@ func (c *UsersController) Query() {
 			"tableData":     []*map[string]interface{}{},
 			"tableColumns":  []*map[string]interface{}{},
 			"tableTotal":    0,
+			"typeOptions":   []*map[string]interface{}{},
+			"statusOptions": []*map[string]interface{}{},
 		}
 		defer func() {
 			c.Data["json"] = result
@@ -39,27 +41,30 @@ func (c *UsersController) Query() {
 		limit := int(rawData["pagination"].(map[string]interface{})["pageSize"].(float64))
 		offset := int(rawData["pagination"].(map[string]interface{})["currentPage"].(float64)-1) * limit
 
-		result["tableData"], result["tableTotal"] = services.UserService.Query("", limit, offset)
+		result["tableData"], result["tableTotal"] = services.CloudService.Query("", limit, offset)
 		result["tableColumns"] = []map[string]string{
-			{"title": "员工ID", "key": "StaffID"},
-			{"title": "用户名", "key": "Name"},
-			{"title": "昵称", "key": "NickName"},
-			{"title": "性别", "key": "Gender"},
-			{"title": "电话", "key": "Tel"},
-			{"title": "地址", "key": "Addr"},
-			{"title": "邮件", "key": "Email"},
-			{"title": "部门", "key": "Department"},
+			{"title": "名称", "key": "Name"},
+			{"title": "类型", "key": "Type"},
+			{"title": "区域", "key": "Region"},
+			{"title": "备注", "key": "Remark"},
+			{"title": "创建时间", "key": "CreatedTime"},
+			{"title": "最近同步时间", "key": "SyncTime"},
 			{"title": "状态", "key": "Status"},
-			{"title": "创建时间", "key": "CreatedAt"},
-			{"title": "更新时间", "key": "UpdatedAt"},
 		}
-		result["genderTextMap"] = services.UserService.GenderTextMap()
-		result["statusTextMap"] = services.UserService.StatusTextMap()
+		result["typeOptions"] = map[string]string{
+			"aliyun":     "阿里云",
+			"tengxunyun": "腾讯云",
+			"aws":        "AWS",
+		}
+		result["statusOptions"] = map[string]string{
+			"0": "启用",
+			"1": "禁用",
+		}
 	}
 }
 
-// 新增用户
-func (c *UsersController) Add() {
+// 新增云平台
+func (c *CloudPlatformController) Add() {
 	if c.Ctx.Input.IsPost() {
 		result := map[string]interface{}{
 			"code": 0,
@@ -70,14 +75,16 @@ func (c *UsersController) Add() {
 			c.ServeJSON()
 		}()
 
-		model := models.NewUser()
+		model := models.NewCloudPlatform()
 		err := c.ParseJson(model)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = fmt.Sprintf("解析Json数据失败：%s", err)
 			return
 		}
-		err = services.UserService.Add(model)
+		username := c.GetRequestUser()
+		user := services.UserService.GetByName(username)
+		err = services.CloudService.Add(model, user)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = fmt.Sprintf("插入数据库失败：%s", err)
@@ -86,8 +93,8 @@ func (c *UsersController) Add() {
 	}
 }
 
-// 修改用户信息
-func (c *UsersController) Modify() {
+// 修改云平台信息
+func (c *CloudPlatformController) Modify() {
 	result := map[string]interface{}{
 		"code": 0,
 		"msg":  "ok",
@@ -97,14 +104,14 @@ func (c *UsersController) Modify() {
 		c.ServeJSON()
 	}()
 
-	model := models.NewUser()
+	model := models.NewCloudPlatform()
 	err := c.ParseJson(model)
 	if err != nil {
 		result["code"] = 500
 		result["msg"] = err
 		return
 	}
-	err = services.UserService.Modify(model)
+	err = services.CloudService.Modify(model)
 	if err != nil {
 		result["code"] = 500
 		result["msg"] = err
@@ -112,8 +119,8 @@ func (c *UsersController) Modify() {
 	}
 }
 
-// 删除用户
-func (c *UsersController) Delete() {
+// 删除云平台
+func (c *CloudPlatformController) Delete() {
 	if c.Ctx.Input.IsPost() {
 		result := map[string]interface{}{
 			"code": 0,
@@ -124,14 +131,14 @@ func (c *UsersController) Delete() {
 			c.ServeJSON()
 		}()
 
-		model := models.NewUser()
+		model := models.NewCloudPlatform()
 		err := c.ParseJson(model)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = err
 			return
 		}
-		err = services.UserService.Delete(model.ID)
+		err = services.CloudService.Delete(model.ID)
 		if err != nil {
 			result["code"] = 500
 			result["msg"] = err

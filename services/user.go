@@ -10,6 +10,27 @@ import (
 type userService struct {
 }
 
+// 查询用户
+func (s *userService) Query(q string, limit, offset int) ([]*models.User, int64) {
+	var users []*models.User
+	querySet := orm.NewOrm().QueryTable(&models.User{})
+
+	cond := orm.NewCondition()
+	if q != "" {
+		cond = cond.Or("name__icontains", q)
+		cond = cond.Or("nickname__icontains", q)
+		cond = cond.Or("tel__icontains", q)
+		cond = cond.Or("addr__icontains", q)
+		cond = cond.Or("email__icontains", q)
+		cond = cond.Or("department__icontains", q)
+	}
+
+	querySet = querySet.SetCond(cond)
+	total, _ := querySet.Count()
+	querySet.Limit(limit).Offset(offset).All(&users, "ID", "StaffID", "Name", "NickName", "Password", "Gender", "Tel", "Addr", "Email", "Department", "Status", "CreatedAt", "UpdatedAt")
+	return users, total
+}
+
 // 根据user id 查询用户信息
 func (s *userService) GetByPk(pk int) *models.User {
 	user := &models.User{ID: pk}
@@ -34,8 +55,12 @@ func (s *userService) Modify(model *models.User) error {
 		user.NickName = model.NickName
 		user.Gender = model.Gender
 		user.Status = model.Status
+		if utils.GeneratePassword(model.Password) != user.Password {
+			user.Password = utils.GeneratePassword(model.Password)
+		}
+		user.Status = model.Status
 		ormer := orm.NewOrm()
-		_, err := ormer.Update(user, "NickName", "Status", "Gender")
+		_, err := ormer.Update(user, "NickName", "Status", "Gender", "Password")
 		if err != nil {
 			return err
 		}
@@ -73,25 +98,6 @@ func (s *userService) GetByName(name string) *models.User {
 		return user
 	}
 	return nil
-}
-
-// 查询用户
-func (s *userService) Query(q string) []*models.User {
-	var users []*models.User
-	querySet := orm.NewOrm().QueryTable(&models.User{})
-	cond := orm.NewCondition()
-	if q != "" {
-		cond = cond.Or("name__icontains", q)
-		cond = cond.Or("nickname__icontains", q)
-		cond = cond.Or("tel__icontains", q)
-		cond = cond.Or("addr__icontains", q)
-		cond = cond.Or("email__icontains", q)
-		cond = cond.Or("department__icontains", q)
-	}
-	cond = cond.AndNot("deleted__exact", 1)
-	querySet = querySet.SetCond(cond)
-	querySet.All(&users)
-	return users
 }
 
 // 用户性别映射

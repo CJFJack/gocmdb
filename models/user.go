@@ -12,7 +12,7 @@ type User struct {
 	StaffID    string     `orm:"column(staff_id);size(32)"`
 	Name       string     `orm:"size(64)"`
 	NickName   string     `orm:"size(64)"`
-	Password   string     `orm:"size(1024)" form:"Password"`
+	Password   string     `orm:"size(1024)"`
 	Gender     int        `orm:"description(1-男,0-女)"`
 	Tel        string     `orm:"size(32)"`
 	Addr       string     `orm:"size(128)"`

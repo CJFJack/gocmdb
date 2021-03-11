@@ -1,6 +1,6 @@
 <template>
     <d2-container>
-        <template slot="header">用户管理</template>
+        <template slot="header">云平台管理</template>
         <el-button type="primary" @click="add('add')">新增</el-button>
         <template>
             <el-table
@@ -9,14 +9,24 @@
                 <el-table-column width="1">
                 </el-table-column>
                 <div v-for="col in tableColumns">
-                    <el-table-column :prop="col.key" :label="col.title" v-if="col.key === 'Gender'">
+                    <el-table-column :prop="col.key" :label="col.title" v-if="col.key==='CreatedTime'">
                         <template slot-scope="scope">
-                            <span>{{ genderTextMap[scope.row[col.key]] }}</span>
+                            <span>{{ formatDateTime(scope.row[col.key]) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.key === 'Status'">
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.key==='SyncTime'">
                         <template slot-scope="scope">
-                            <span>{{ statusTextMap[scope.row[col.key]] }}</span>
+                            <span>{{ formatDateTime(scope.row[col.key]) }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.key==='Type'">
+                        <template slot-scope="scope">
+                            <span>{{ typeOptions[scope.row[col.key]] }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.key==='Status'">
+                        <template slot-scope="scope">
+                            <span>{{ statusOptions[scope.row[col.key]] }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :prop="col.key" :label="col.title" v-else>
@@ -50,38 +60,32 @@
 
         <el-dialog title="新增 / 编辑" :visible.sync="dialogVisible" :destroy-on-close="true">
             <el-form ref="form" :model="form" :rules="rules" label-width="120px">
-                <el-form-item label="员工ID" prop="StaffID">
-                    <el-input v-model="form.StaffID" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="用户名" prop="Name">
+                <el-form-item label="名称" prop="Name">
                     <el-input v-model="form.Name" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="昵称" prop="NickName">
-                    <el-input v-model="form.NickName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="登录密码" prop="Password">
-                    <el-input type="password" v-model="form.Password" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="性别">
-                    <el-select v-model="form.Gender" placeholder="请选择性别">
-                        <el-option v-for="(text, key, index) in genderTextMap" :label="text" :value="index"></el-option>
+                <el-form-item label="类型" prop="Type">
+                    <el-select v-model="form.Type">
+                        <el-option v-for="(item, index) in typeOptions" :label="item" :key="index" :value="index"></el-option>
                     </el-select>
-                </el-form-item>
-                <el-form-item label="电话" prop="Tel">
-                    <el-input v-model="form.Tel" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="邮箱" prop="Email">
-                    <el-input v-model="form.Email" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="地址" prop="Addr">
                     <el-input v-model="form.Addr" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="部门" prop="Department">
-                    <el-input v-model="form.Department" autocomplete="off"></el-input>
+                <el-form-item label="AccessKey" prop="AccessKey">
+                    <el-input type="password" v-model="form.AccessKey" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="SecretKey" prop="SecretKey">
+                    <el-input type="password" v-model="form.SecretKey" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="地域" prop="Region">
+                    <el-input v-model="form.Region" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="备注" prop="Remark">
+                    <el-input v-model="form.Remark" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="form.Status" placeholder="请选择状态">
-                        <el-option v-for="(text, key, index) in statusTextMap" :label="text" :value="index"></el-option>
+                        <el-option v-for="(text, key, index) in statusOptions" :label="text" :value="index"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -95,15 +99,17 @@
 
 <script>
     export default {
-        name: "users",
+        name: "cloud_platform_management",
         watch: {
-            "action": function (val) {
-                if (val === 'add') {
-                    this.rules.Password = [{required: true, message: '请输入密码', trigger: 'blur'}]
-                } else if (val === 'modify') {
-                    this.rules.Password = [{required: false}]
-                }
-            }
+          "action": function (val) {
+              if (val === 'add') {
+                  this.rules.AccessKey = [{required: true, message: '请输入AccessKey', trigger: 'blur'}]
+                  this.rules.SecretKey = [{required: true, message: '请输入SecretKey', trigger: 'blur'}]
+              } else if (val === 'modify') {
+                  this.rules.AccessKey = [{required: false}]
+                  this.rules.SecretKey = [{required: false}]
+              }
+          }
         },
         data() {
             return {
@@ -122,25 +128,25 @@
                 },
                 dialogVisible: false,
                 form: {
-                    StaffID: '',
                     Name: '',
-                    NickName: '',
-                    Password: '',
-                    Gender: 0,
-                    Tel: "",
-                    Email: "",
-                    Addr: "",
-                    Department: "",
+                    Type: '',
+                    Addr: '',
+                    AccessKey: "",
+                    SecretKey: "",
+                    Region: "",
+                    Remark: "",
                     Status: 0,
                 },
                 rules: {
-                    StaffID: [{required: true, message: '请输入员工ID', trigger: 'blur'}],
-                    Name: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-                    NickName: [{required: true, message: '请输入昵称', trigger: 'blur'}],
-                    Password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+                    Name: [{required: true, message: '请输入名称', trigger: 'blur'}],
+                    Type: [{required: true, message: '请输入类型', trigger: 'blur'}],
+                    Addr: [{required: true, message: '请输入地址', trigger: 'blur'}],
+                    AccessKey: [{required: true, message: '请输入AccessKey', trigger: 'blur'}],
+                    SecretKey: [{required: true, message: '请输入SecretKey', trigger: 'blur'}],
+                    Region: [{required: true, message: '请输入地域', trigger: 'blur'}],
                 },
-                genderTextMap: {},
-                statusTextMap: {},
+                typeOptions: {},
+                statusOptions: {},
                 action: '',
             }
         },
@@ -151,6 +157,13 @@
                 });
             },
 
+            formatDateTime(value) {
+                if (value) {
+                    return value.replace("T", " ").replace("+08:00", "")
+                }
+                return ""
+            },
+
             async listTable() {
                 const data = {
                     pagination: {
@@ -158,22 +171,22 @@
                         pageSize: this.pagination.pageSize,
                     }
                 }
-                const res = await this.$api.LIST_USERS(data)
+                const res = await this.$api.LIST_CLOUD_PLATFORM(data)
                 this.tableData = res.tableData
                 this.tableColumns = res.tableColumns
                 this.pagination.total = res.tableTotal
-                this.genderTextMap = res.genderTextMap
-                this.statusTextMap = res.statusTextMap
+                this.typeOptions = res.typeOptions
+                this.statusOptions = res.statusOptions
             },
 
             saveForm() {
                 this.$refs["form"].validate(async (valid) => {
                     if (valid) {
                         if (this.action === 'add') {
-                            await this.$api.USER_ADD(this.form)
+                            await this.$api.ADD_CLOUD_PLATFORM(this.form)
                             this.listTable()
                         } else if (this.action === 'modify') {
-                            await this.$api.USER_MODIFY(this.form)
+                            await this.$api.MODIFY_CLOUD_PLATFORM(this.form)
                             this.notice("恭喜", "修改成功")
                             this.listTable()
                         }
@@ -187,15 +200,13 @@
 
             add(action) {
                 this.form = {
-                    StaffID: '',
                     Name: '',
-                    NickName: '',
-                    Password: '',
-                    Gender: 0,
-                    Tel: "",
-                    Email: "",
-                    Addr: "",
-                    Department: "",
+                    Type: '',
+                    Addr: '',
+                    AccessKey: "",
+                    SecretKey: "",
+                    Region: "",
+                    Remark: "",
                     Status: 0,
                 }
                 this.action = action
@@ -213,7 +224,7 @@
                 let data = {
                     id: row.ID
                 }
-                await this.$api.USER_DEL(data)
+                await this.$api.DEL_CLOUD_PLATFORM(data)
                 this.$message({
                     type: 'success',
                     message: '删除成功!'
@@ -222,7 +233,7 @@
             },
 
             delConfirm(row) {
-                this.$confirm('此操作将删除该用户, 是否继续?', '提示', {
+                this.$confirm('此操作将删除云平台, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
