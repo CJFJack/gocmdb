@@ -209,7 +209,6 @@
             },
 
             async del(row) {
-                console.log(row)
                 let data = {
                     id: row.ID
                 }

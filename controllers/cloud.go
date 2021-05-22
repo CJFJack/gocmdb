@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 	"gocmdb/base/controllers/auth"
+	"gocmdb/cloud"
+	_ "gocmdb/cloud/plugin"
 	"gocmdb/models"
 	"gocmdb/services"
 )
@@ -18,11 +20,11 @@ func (c *CloudPlatformController) Query() {
 			"code":          0,
 			"msg":           "ok",
 			"genderTextMap": map[string]string{},
-			"tableData":     []*map[string]interface{}{},
-			"tableColumns":  []*map[string]interface{}{},
-			"tableTotal":    0,
-			"typeOptions":   []*map[string]interface{}{},
-			"statusOptions": []*map[string]interface{}{},
+			"tableData": []*map[string]interface{}{},
+			"tableColumns": []*map[string]interface{}{},
+			"tableTotal": 0,
+			"typeOptions": map[string]string{},
+			"statusOptions": []*map[string]string{},
 		}
 		defer func() {
 			c.Data["json"] = result
@@ -41,7 +43,7 @@ func (c *CloudPlatformController) Query() {
 		limit := int(rawData["pagination"].(map[string]interface{})["pageSize"].(float64))
 		offset := int(rawData["pagination"].(map[string]interface{})["currentPage"].(float64)-1) * limit
 
-		result["tableData"], result["tableTotal"] = services.CloudService.Query("", limit, offset)
+		result["tableData"], result["tableTotal"] = services.CloudService.Query("", limit, offset, true)
 		result["tableColumns"] = []map[string]string{
 			{"title": "名称", "key": "Name"},
 			{"title": "类型", "key": "Type"},
@@ -51,15 +53,8 @@ func (c *CloudPlatformController) Query() {
 			{"title": "最近同步时间", "key": "SyncTime"},
 			{"title": "状态", "key": "Status"},
 		}
-		result["typeOptions"] = map[string]string{
-			"aliyun":     "阿里云",
-			"tengxunyun": "腾讯云",
-			"aws":        "AWS",
-		}
-		result["statusOptions"] = map[string]string{
-			"0": "启用",
-			"1": "禁用",
-		}
+		result["typeOptions"] = cloud.DefaultManager.TypeOptions()
+		result["statusOptions"] = services.CloudService.StatusTextMap()
 	}
 }
 
@@ -105,16 +100,18 @@ func (c *CloudPlatformController) Modify() {
 	}()
 
 	model := models.NewCloudPlatform()
+
 	err := c.ParseJson(model)
 	if err != nil {
 		result["code"] = 500
 		result["msg"] = err
 		return
 	}
+
 	err = services.CloudService.Modify(model)
 	if err != nil {
 		result["code"] = 500
-		result["msg"] = err
+		result["msg"] = fmt.Sprintf("%s", err)
 		return
 	}
 }

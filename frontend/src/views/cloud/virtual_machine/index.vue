@@ -1,22 +1,35 @@
 <template>
     <d2-container>
         <template slot="header">云主机管理</template>
-        <el-button type="primary" @click="add('add')">新增</el-button>
         <template>
             <el-table
+                    size="mini"
                     :data="tableData"
                     style="width: 100%">
                 <el-table-column width="1">
                 </el-table-column>
                 <div v-for="col in tableColumns">
-                    <el-table-column :prop="col.key" :label="col.title" v-if="col.key === 'Gender'">
+                    <el-table-column :prop="col.key" :label="col.title" v-if="col.title==='IP地址'">
                         <template slot-scope="scope">
-                            <span>{{ genderTextMap[scope.row[col.key]] }}</span>
+                            <span v-if="scope.row['PublicAddrs']">公网地址：{{scope.row["PublicAddrs"] }}</span><br>
+                            <span v-if="scope.row['PrivateAddrs']">私网地址：{{scope.row["PrivateAddrs"] }}</span><br>
                         </template>
                     </el-table-column>
-                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.key === 'Status'">
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.title==='时间'" width="230">
                         <template slot-scope="scope">
-                            <span>{{ statusTextMap[scope.row[col.key]] }}</span>
+                            <span>创建时间：{{scope.row["VmCreatedTime"] }}</span><br>
+                            <span>过期时间：{{scope.row["VmExpiredTime"] }}</span><br>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.title==='平台'">
+                        <template slot-scope="scope">
+                            <div v-html="scope.row[col.key].Name"></div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :prop="col.key" :label="col.title" v-else-if="col.title==='配置'">
+                        <template slot-scope="scope">
+                            <span>CPU：{{scope.row["CPU"] }} 核</span><br>
+                            <span>内存：{{scope.row["Mem"] }} M</span><br>
                         </template>
                     </el-table-column>
                     <el-table-column :prop="col.key" :label="col.title" v-else>
@@ -25,10 +38,11 @@
                 <el-table-column
                         fixed="right"
                         label="操作"
-                        width="180">
+                        width="230">
                     <template slot-scope="scope">
-                        <el-button @click="modify(scope.row)" type="success" size="mini">修改</el-button>
-                        <el-button type="danger" @click="delConfirm(scope.row)" size="mini">删除</el-button>
+                        <el-button type="danger" @click="rebootConfirm(scope.row)" size="mini">重启</el-button>
+                        <el-button type="success" @click="startConfirm(scope.row)" size="mini">开机</el-button>
+                        <el-button type="warning" @click="stopConfirm(scope.row)" size="mini">关机</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -149,12 +163,10 @@
                         pageSize: this.pagination.pageSize,
                     }
                 }
-                const res = await this.$api.LIST_USERS(data)
+                const res = await this.$api.LIST_VIRTUAL_MACHINE(data)
                 this.tableData = res.tableData
                 this.tableColumns = res.tableColumns
                 this.pagination.total = res.tableTotal
-                this.genderTextMap = res.genderTextMap
-                this.statusTextMap = res.statusTextMap
             },
 
             saveForm() {
@@ -217,17 +229,74 @@
                 this.listTable()
             },
 
-            delConfirm(row) {
-                this.$confirm('此操作将删除该用户, 是否继续?', '提示', {
+            async start(row) {
+                await this.$api.START_VIRTUAL_MACHINE(row)
+                this.listTable()
+                this.$message({
+                    type: 'success',
+                    message: '启动成功'
+                });
+            },
+
+            async stop(row) {
+                await this.$api.STOP_VIRTUAL_MACHINE(row)
+                this.listTable()
+                this.$message({
+                    type: 'success',
+                    message: '关机成功'
+                });
+            },
+
+            async reboot(row) {
+                await this.$api.REBOOT_VIRTUAL_MACHINE(row)
+                this.listTable()
+                this.$message({
+                    type: 'success',
+                    message: '重启成功'
+                });
+            },
+
+            rebootConfirm(row) {
+                this.$confirm('此操作将重启云主机, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.del(row)
+                    this.reboot(row)
                 }).catch(() => {
                     this.$message({
                         type: 'info',
-                        message: '已取消删除'
+                        message: '已取消重启'
+                    });
+                });
+            },
+
+            startConfirm(row) {
+                this.$confirm('此操作将启动云主机, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.start(row)
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消启动'
+                    });
+                });
+            },
+
+            stopConfirm(row) {
+                this.$confirm('此操作将关闭云主机, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.stop(row)
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消关闭'
                     });
                 });
             },
@@ -247,6 +316,13 @@
         },
         mounted() {
             this.listTable()
+            this.timer = setInterval(() => {
+                //获取数据
+                this.listTable()
+            }, 10 * 1000)
+        },
+        destroyed() {
+            clearInterval(this.timer)
         }
     }
 </script>

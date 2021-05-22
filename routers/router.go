@@ -18,4 +18,5 @@ func init() {
 	beego.AutoRouter(&controllers.AuthController{})
 	beego.AutoRouter(&controllers.UsersController{})
 	beego.AutoRouter(&controllers.CloudPlatformController{})
+	beego.AutoRouter(&controllers.VirtualMachineController{})
 }

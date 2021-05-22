@@ -5,6 +5,7 @@
         <template>
             <el-table
                     :data="tableData"
+                    size="mini"
                     style="width: 100%">
                 <el-table-column width="1">
                 </el-table-column>
@@ -65,7 +66,7 @@
                 </el-form-item>
                 <el-form-item label="类型" prop="Type">
                     <el-select v-model="form.Type">
-                        <el-option v-for="(item, index) in typeOptions" :label="item" :key="index" :value="index"></el-option>
+                        <el-option v-for="(item, key) in typeOptions" :label="item" :key="key" :value="key"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="地址" prop="Addr">
@@ -81,7 +82,7 @@
                     <el-input v-model="form.Region" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" prop="Remark">
-                    <el-input v-model="form.Remark" autocomplete="off"></el-input>
+                    <el-input type="textarea" v-model="form.Remark" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="form.Status" placeholder="请选择状态">
@@ -186,8 +187,8 @@
                             await this.$api.ADD_CLOUD_PLATFORM(this.form)
                             this.listTable()
                         } else if (this.action === 'modify') {
-                            await this.$api.MODIFY_CLOUD_PLATFORM(this.form)
-                            this.notice("恭喜", "修改成功")
+                            const res = await this.$api.MODIFY_CLOUD_PLATFORM(this.form)
+                            // this.notice("恭喜", "修改成功")
                             this.listTable()
                         }
                         this.dialogVisible = false
@@ -220,7 +221,6 @@
             },
 
             async del(row) {
-                console.log(row)
                 let data = {
                     id: row.ID
                 }

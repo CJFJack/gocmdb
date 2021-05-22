@@ -10,5 +10,6 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/smartystreets/goconvey v1.6.4
+	github.com/tencentcloud/tencentcloud-sdk-go v1.0.126
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 )
