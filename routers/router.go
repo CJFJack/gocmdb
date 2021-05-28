@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 	"gocmdb/controllers"
+	v1 "gocmdb/controllers/api/v1"
 )
 
 func init() {
@@ -19,7 +20,13 @@ func init() {
 	beego.AutoRouter(&controllers.UsersController{})
 	beego.AutoRouter(&controllers.CloudPlatformController{})
 	beego.AutoRouter(&controllers.VirtualMachineController{})
+
+	// Prometheus
 	beego.AutoRouter(&controllers.NodeController{})
 	beego.AutoRouter(&controllers.JobController{})
 	beego.AutoRouter(&controllers.TargetController{})
+
+	// v1
+	v1Prometheus := beego.NewNamespace("v1", beego.NSAutoRouter(&v1.PrometheusController{}))
+	beego.AddNamespace(v1Prometheus)
 }

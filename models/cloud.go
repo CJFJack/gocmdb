@@ -19,7 +19,7 @@ type CloudPlatform struct {
 	DeletedTime     *time.Time        `orm:"column(deleted_time);type(datetime);null"`
 	SyncTime        *time.Time        `orm:"column(sync_time);type(datetime);null"`
 	User            *User             `orm:"column(user);rel(fk)"`
-	Status          int               `orm:"column(status);description(0-启用,1-禁用)"`
+	Status          int               `orm:"column(status);description(0-启用,api.conf-禁用)"`
 	VirtualMachines []*VirtualMachine `orm:"reverse(many)"`
 	Msg             string            `orm:"column(msg);null"`
 }

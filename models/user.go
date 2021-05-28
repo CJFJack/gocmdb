@@ -13,12 +13,12 @@ type User struct {
 	Name       string     `orm:"size(64)"`
 	NickName   string     `orm:"size(64)"`
 	Password   string     `orm:"size(1024)"`
-	Gender     int        `orm:"description(1-男,0-女)"`
+	Gender     int        `orm:"description(api.conf-男,0-女)"`
 	Tel        string     `orm:"size(32)"`
 	Addr       string     `orm:"size(128)"`
 	Email      string     `orm:"size(64)"`
 	Department string     `orm:"size(128)"`
-	Status     int        `orm:"description(0-正常,1-锁定，2-离职)"`
+	Status     int        `orm:"description(0-正常,api.conf-锁定，2-离职)"`
 	CreatedAt  *time.Time `orm:"auto_now_add"`
 	UpdatedAt  *time.Time `orm:"auto_now"`
 	DeletedAt  *time.Time `orm:"null"`

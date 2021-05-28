@@ -37,7 +37,6 @@ func (s *cloudService) Query(q string, limit, offset int, hidePass bool) ([]*mod
 		querySet.Limit(limit).Offset(offset).All(&cloudPlatform, "ID", "Name", "Type", "Addr", "Region", "Remark", "CreatedTime", "SyncTime", "User", "Status", "AccessKey", "SecretKey")
 	}
 
-
 	return cloudPlatform, total
 }
 
@@ -54,8 +53,8 @@ func (s *cloudService) GetByPk(pk int) *models.CloudPlatform {
 // 检验参数配置
 func (s *cloudService) Valid(model *models.CloudPlatform) error {
 	beego.Info(model.Type)
- 	if sdk, ok := cloud.DefaultManager.Cloud(model.Type); !ok {
- 		return fmt.Errorf("类型错误")
+	if sdk, ok := cloud.DefaultManager.Cloud(model.Type); !ok {
+		return fmt.Errorf("类型错误")
 	} else {
 		sdk.Init(model.Addr, model.Region, model.AccessKey, model.SecretKey)
 		if err := sdk.TestConnect(); err != nil {
@@ -138,13 +137,13 @@ func (s *cloudService) GetByName(name string) *models.User {
 // 状态映射
 func (s *cloudService) StatusTextMap() map[string]string {
 	return map[string]string{
-		"0": "启用",
-		"1": "禁用",
+		"0":        "启用",
+		"api.conf": "禁用",
 	}
 }
 
 // 更新同步信息
-func(s *cloudService) SyncInfo(platform *models.CloudPlatform, now *time.Time, msg string) error {
+func (s *cloudService) SyncInfo(platform *models.CloudPlatform, now *time.Time, msg string) error {
 	platform.SyncTime = now
 	platform.Msg = msg
 	_, err := orm.NewOrm().Update(platform, "SyncTime", "Msg")

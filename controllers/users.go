@@ -24,7 +24,6 @@ func (c *UsersController) Query() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -67,7 +66,6 @@ func (c *UsersController) Add() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewUser()
@@ -94,7 +92,6 @@ func (c *UsersController) Modify() {
 	}
 	defer func() {
 		c.Data["json"] = result
-		c.ServeJSON()
 	}()
 
 	model := models.NewUser()
@@ -121,7 +118,6 @@ func (c *UsersController) Delete() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewUser()

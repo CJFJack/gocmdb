@@ -25,3 +25,8 @@ func (c *BaseController) ParsePostForm(form interface{}) (map[string]interface{}
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &form)
 	return form.(map[string]interface{}), err
 }
+
+func (c *BaseController) Render() error {
+	c.ServeJSON()
+	return nil
+}

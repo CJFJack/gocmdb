@@ -24,7 +24,6 @@ func (c *NodeController) Query() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -59,7 +58,6 @@ func (c *NodeController) Add() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewNode()
@@ -87,7 +85,6 @@ func (c *NodeController) Delete() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewNode()
@@ -114,7 +111,6 @@ func (c *NodeController) Modify() {
 	}
 	defer func() {
 		c.Data["json"] = result
-		c.ServeJSON()
 	}()
 
 	model := models.NewNode()
@@ -150,7 +146,6 @@ func (c *JobController) Query() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -186,7 +181,6 @@ func (c *JobController) Add() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		//model := models.NewJob()
@@ -215,7 +209,6 @@ func (c *JobController) Delete() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewJob()
@@ -242,7 +235,6 @@ func (c *JobController) Modify() {
 	}
 	defer func() {
 		c.Data["json"] = result
-		c.ServeJSON()
 	}()
 
 	form := &forms.JobModifyForm{}
@@ -278,7 +270,6 @@ func (c *TargetController) Query() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -316,7 +307,6 @@ func (c *TargetController) Add() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		//model := models.NewJob()
@@ -345,7 +335,6 @@ func (c *TargetController) Delete() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewTarget()
@@ -372,7 +361,6 @@ func (c *TargetController) Modify() {
 	}
 	defer func() {
 		c.Data["json"] = result
-		c.ServeJSON()
 	}()
 
 	form := &forms.TargetModifyForm{}

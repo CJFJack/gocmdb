@@ -16,15 +16,14 @@ type VirtualMachineController struct {
 func (c *VirtualMachineController) Query() {
 	if c.Ctx.Input.IsPost() {
 		result := map[string]interface{}{
-			"code": 0,
-			"msg":  "ok",
-			"tableData": []*map[string]interface{}{},
+			"code":         0,
+			"msg":          "ok",
+			"tableData":    []*map[string]interface{}{},
 			"tableColumns": []*map[string]interface{}{},
-			"tableTotal": 0,
+			"tableTotal":   0,
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -53,7 +52,6 @@ func (c *VirtualMachineController) Query() {
 	}
 }
 
-
 // 启动云主机
 func (c *VirtualMachineController) Start() {
 	if c.Ctx.Input.IsPost() {
@@ -63,7 +61,6 @@ func (c *VirtualMachineController) Start() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -106,7 +103,6 @@ func (c *VirtualMachineController) Stop() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -149,7 +145,6 @@ func (c *VirtualMachineController) Reboot() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {

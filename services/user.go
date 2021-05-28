@@ -103,17 +103,17 @@ func (s *userService) GetByName(name string) *models.User {
 // 用户性别映射
 func (s *userService) GenderTextMap() map[string]string {
 	return map[string]string{
-		"1": "男",
-		"0": "女",
+		"api.conf": "男",
+		"0":        "女",
 	}
 }
 
 // 用户状态映射
 func (s *userService) StatusTextMap() map[string]string {
 	return map[string]string{
-		"0": "正常",
-		"1": "锁定",
-		"2": "离职",
+		"0":        "正常",
+		"api.conf": "锁定",
+		"2":        "离职",
 	}
 }
 

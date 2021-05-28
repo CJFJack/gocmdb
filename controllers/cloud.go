@@ -20,15 +20,14 @@ func (c *CloudPlatformController) Query() {
 			"code":          0,
 			"msg":           "ok",
 			"genderTextMap": map[string]string{},
-			"tableData": []*map[string]interface{}{},
-			"tableColumns": []*map[string]interface{}{},
-			"tableTotal": 0,
-			"typeOptions": map[string]string{},
+			"tableData":     []*map[string]interface{}{},
+			"tableColumns":  []*map[string]interface{}{},
+			"tableTotal":    0,
+			"typeOptions":   map[string]string{},
 			"statusOptions": []*map[string]string{},
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		jsonData := struct {
@@ -67,7 +66,6 @@ func (c *CloudPlatformController) Add() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewCloudPlatform()
@@ -96,7 +94,6 @@ func (c *CloudPlatformController) Modify() {
 	}
 	defer func() {
 		c.Data["json"] = result
-		c.ServeJSON()
 	}()
 
 	model := models.NewCloudPlatform()
@@ -125,7 +122,6 @@ func (c *CloudPlatformController) Delete() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		model := models.NewCloudPlatform()

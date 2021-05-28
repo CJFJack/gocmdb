@@ -34,7 +34,6 @@ func (c *AuthController) Login() {
 		}
 		defer func() {
 			c.Data["json"] = result
-			c.ServeJSON()
 		}()
 
 		config.Cache.Incr("login")
@@ -86,5 +85,4 @@ func (c *AuthController) Logout() {
 		"code": 0,
 		"msg":  "注销成功",
 	}
-	c.ServeJSON()
 }
