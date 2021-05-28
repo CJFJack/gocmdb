@@ -16,6 +16,10 @@ type Node struct {
 	Jobs      []*Job     `orm:"reverse(many)"`
 }
 
+func NewNode() (node *Node) {
+	return &Node{}
+}
+
 type Job struct {
 	ID        int        `orm:"column(id);"`
 	Key       string     `orm:"varchar(64)"`
@@ -25,6 +29,10 @@ type Job struct {
 	DeletedAt *time.Time `orm:"null"`
 	Node      *Node      `orm:"rel(fk)"`
 	Targets   []*Target  `orm:"reverse(many)"`
+}
+
+func NewJob() (node *Job) {
+	return &Job{}
 }
 
 type Target struct {
@@ -38,6 +46,10 @@ type Target struct {
 	Job       *Job       `orm:"rel(fk)"`
 }
 
-func init()  {
+func NewTarget() (node *Target) {
+	return &Target{}
+}
+
+func init() {
 	orm.RegisterModel(new(Node), new(Job), new(Target))
 }

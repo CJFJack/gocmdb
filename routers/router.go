@@ -19,4 +19,7 @@ func init() {
 	beego.AutoRouter(&controllers.UsersController{})
 	beego.AutoRouter(&controllers.CloudPlatformController{})
 	beego.AutoRouter(&controllers.VirtualMachineController{})
+	beego.AutoRouter(&controllers.NodeController{})
+	beego.AutoRouter(&controllers.JobController{})
+	beego.AutoRouter(&controllers.TargetController{})
 }

@@ -38,5 +38,14 @@ export const menuAside = supplementPath([
       { path: '/cloud/platform_management', title: '云平台管理', icon: 'cube' },
       { path: '/cloud/virtual_machine', title: '云主机管理', icon: 'server' },
     ]
+  },
+  {
+    title: 'Prometheus',
+    icon: 'eercast',
+    children: [
+      { path: '/prometheus/node', title: 'Node', icon: 'linode' },
+      { path: '/prometheus/job', title: 'Job', icon: 'linode' },
+      { path: '/prometheus/target', title: 'Target', icon: 'linode' },
+    ]
   }
 ])
