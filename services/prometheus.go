@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"gocmdb/forms"
 	"gocmdb/models"
@@ -45,12 +44,29 @@ func (s *nodeService) GetByPk(pk int) *models.Node {
 	return nil
 }
 
-// 新增Node节点
-func (s *nodeService) Add(model *models.Node) error {
+// 根据 UUID 查询Node节点
+func (s *nodeService) GetByUUID(UUID string) *models.Node {
+	node := &models.Node{UUID: UUID}
 	ormer := orm.NewOrm()
-	beego.Info(fmt.Sprintf("%#v", model))
-	_, _, err := ormer.ReadOrCreate(model, "UUID")
-	return err
+	if err := ormer.Read(node, "UUID"); err == nil {
+		return node
+	}
+	return nil
+}
+
+// 注册Node节点
+func (s *nodeService) Register(model *models.Node) error {
+	ormer := orm.NewOrm()
+	if node := s.GetByUUID(model.UUID); node != nil {
+		node.Hostname = model.Hostname
+		node.Addr = model.Addr
+		node.DeletedAt = nil
+		_, err := ormer.Update(node)
+		return err
+	} else {
+		_, err := ormer.Insert(model)
+		return err
+	}
 }
 
 // 逻辑删除Node节点数据
@@ -102,6 +118,18 @@ func (s *jobService) GetByPk(pk int) *models.Job {
 		return job
 	}
 	return nil
+}
+
+// 根据 uuid 查询Target
+func (s *jobService) GetByUUID(uuid string) []*models.Job {
+	var jobs []*models.Job
+	ormer := orm.NewOrm()
+	querySet := ormer.QueryTable(&models.Job{})
+	querySet.RelatedSel().Filter("deleted_at__isnull", true).Filter("node__uuid", uuid).All(&jobs)
+	for _, job := range jobs {
+		ormer.LoadRelated(job, "Targets")
+	}
+	return jobs
 }
 
 // 查询Job

@@ -13,7 +13,7 @@ type Node struct {
 	CreatedAt *time.Time `orm:"auto_now_add"`
 	UpdatedAt *time.Time `orm:"auto_now"`
 	DeletedAt *time.Time `orm:"null"`
-	Jobs      []*Job     `orm:"reverse(many)"`
+	Jobs      []*Job     `orm:"reverse(many)"  json:"-"`
 }
 
 func NewNode() (node *Node) {
@@ -43,7 +43,7 @@ type Target struct {
 	CreatedAt *time.Time `orm:"auto_now_add"`
 	UpdatedAt *time.Time `orm:"auto_now"`
 	DeletedAt *time.Time `orm:"null"`
-	Job       *Job       `orm:"rel(fk)"`
+	Job       *Job       `orm:"rel(fk)" json:"-"`
 }
 
 func NewTarget() (node *Target) {

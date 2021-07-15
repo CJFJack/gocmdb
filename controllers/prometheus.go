@@ -49,33 +49,6 @@ func (c *NodeController) Query() {
 	}
 }
 
-// 新增Node节点
-func (c *NodeController) Add() {
-	if c.Ctx.Input.IsPost() {
-		result := map[string]interface{}{
-			"code": 0,
-			"msg":  "ok",
-		}
-		defer func() {
-			c.Data["json"] = result
-		}()
-
-		model := models.NewNode()
-		err := c.ParseJson(model)
-		if err != nil {
-			result["code"] = 500
-			result["msg"] = fmt.Sprintf("解析Json数据失败：%s", err)
-			return
-		}
-		err = services.NodeService.Add(model)
-		if err != nil {
-			result["code"] = 500
-			result["msg"] = fmt.Sprintf("插入数据库失败：%s", err)
-			return
-		}
-	}
-}
-
 // 删除Node节点
 func (c *NodeController) Delete() {
 	if c.Ctx.Input.IsPost() {

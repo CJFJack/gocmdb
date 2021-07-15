@@ -70,11 +70,11 @@
                 <el-form-item label="名称" prop="Name">
                     <el-input v-model="form.Name" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="备注" prop="Remark">
-                    <el-input type="text" v-model="form.Remark" autocomplete="off"></el-input>
-                </el-form-item>
                 <el-form-item label="地址" prop="Addr">
                     <el-input v-model="form.Addr" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="备注" prop="Remark">
+                    <el-input type="text" v-model="form.Remark" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -111,7 +111,8 @@
                 },
                 rules: {
                     Job: [{required: true, message: '请选择Job', trigger: 'blur'}],
-                    Name: [{required: true, message: '请输入Name', trigger: 'blur'}],
+                    Name: [{required: true, message: '请输入名称', trigger: 'blur'}],
+                    Addr: [{required: true, message: '请输入地址', trigger: 'blur'}],
                     Remark: [{required: true, message: '请输入备注', trigger: 'blur'}],
                 },
                 action: '',
